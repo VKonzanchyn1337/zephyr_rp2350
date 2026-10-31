@@ -1,0 +1,39 @@
+/* file: rpi_pico2.overlay | devicetree overlay | waveshare rp2350 usb-c board */
+
+/ {
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
+		zephyr,shell-uart = &cdc_acm_uart0;
+	};
+
+	aliases {
+		led0 = &status_led;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		status_led: led_0 {
+			/* FILL: onboard LED GPIO pin — waveshare rp2350 usb-c schematic,
+			   most waveshare rp2350 boards use GP25, verify against your
+			   board's pinout PDF before flashing */
+			gpios = <&gpio0 25 GPIO_ACTIVE_HIGH>;
+			label = "status led";
+		};
+	};
+};
+
+&usbd {
+	status = "okay";
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+};
+
+/* rpi_pico2 board base .dts already defines code_partition (slot0_partition)
+ * and a storage_partition — we only add/relabel storage_partition to the
+ * node name littlefs expects, no need to redeclare the whole partitions
+ * table and no risk of duplicate labels */
+&storage_partition {
+	label = "storage";
+};
